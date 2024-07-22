@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+
+<!-- Begin Jekyll SEO tag v2.4.0 -->
+<title>Multi-Robot-Systems</title>
+<meta name="generator" content="Jekyll v3.7.3" />
+<meta property="og:title" content="Stereo-visual-odometry" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://cgarg92.github.io/Stereo-visual-odometry/" />
+<meta property="og:url" content="https://cgarg92.github.io/Stereo-visual-odometry/" />
+<meta property="og:site_name" content="Multi-Robot-Systems" />
+<script type="application/ld+json">
+{"name":"Multi-Robot-Systems","@type":"WebSite","url":"https://github.com/KhAlamdar11/mrs-r1","headline":"Multi-Robot-Systems","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#157878">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Multi-Robot Systems Project</h1>
+      <h2 class="project-tagline"></h2>
+      
+        <a href="https://github.com/KhAlamdar11/mrs-r1" class="btn">View on GitHub</a>
+      
+      
+    </section>
+
+  <section class="main-content">
+      <div align="center">
+ <!-- <font size="20"> Controlling a Swarm of Robots in a Simulator Stage using Reynolds Rules</font><br /> -->
+ <font size="20"> Controlling a Swarm of Robots in a Simulator Stage using Reynolds Rules</font><br />
+<!-- Chirayu Garg, Utkarsh Jain<br />
+ University of Wisconsin-Madison<br />
+ {cgarg2, utkarsh.jain}@wisc.edu -->
+ Joseph Adeola <br />
+ Khawaja Alamdar <br />
+ Nada Abbas <br />
+ Moses Ebere
+</div>
+
+<h1 id="introduction">Introduction</h1>
+
+<p  style="text-align: justify; text-justify: inter-word; margin-left: auto; margin-right: auto;">
+Swarm robotics has become an increasingly significant domain in the field of robotics, drawing inspiration from the collective behaviors observed in natural systems such as
+flocks of birds, schools of fish, and colonies of insects. This burgeoning area seeks to understand, model, and replicate
+these intricate behaviors within artificial systems comprising multiple autonomous robots. Craig Reynolds’ seminal work in 1987 introduced a set of behavioral rules, serving as fundamental principles for simulating emergent behaviors in decentralized systems. </p>
+
+<p style="text-align: justify; text-justify: inter-word; margin-left: auto; margin-right: auto;"> The objective of this project is to delve into the practical implementation and assessment of Reynolds’ behavioral
+rules within a simulated environment in a (ROS) framework and the Stage simulator. Building upon the three
+core rules of Reynolds’; separation, alignment, and cohesion, the project aims to extend the swarm’s capabilities by
+introducing Navigation and Obstacle Avoidance behaviors.
+Navigation enables the swarm to move towards predefined
+points within the environment, gradually decelerating as
+they approach the target and coming to a stop at the designated location. Simultaneously, the Obstacle Avoidance
+rule equips the swarm with the capability to detect and
+evade obstacles present in the environment, adjusting their
+trajectories to circumvent potential collisions.
+The simulated robots, represented as omnidirectional
+entities, undergo rigorous testing across various simulated
+scenarios and environments. The evaluation focuses on analyzing the swarm’s collective behavior, adaptability, and
+robustness in response to diverse environmental conditions.
+This project seeks to bridge theoretical concepts with
+practical implementation, offering insights into the dynamics of collective behaviors exhibited by robotic swarms governed by Reynolds’ rules and additional algorithms within
+simulated settings </p>
+
+
+<section>
+<h1>Definition of Terms</h1>
+<ul>
+  
+  <!-- <li><h2>Local Neighbourhood</h2></li>
+  <p>The local neighbourhood is defined as the area around a boid in which it senses and responds to its peers. This detection enables boids to engage in complex behaviors such as alignment, cohesion, and separation, which are fundamental to achieving realistic flocking movement. It’s a dynamic concept, adjusting as boids move and their relative distances change.</p>
+  <div class="behaviors-grid">
+    <div class="behavior">
+      <h3>Description</h3>
+      <p>The local neighbourhood encompasses the immediate surroundings of a boid, allowing it to detect other boids and obstacles within a certain range. </p>
+      <div class="behavior-images">
+        <img src="assets/Images/local_neighborhood/local_neighborhood_1.png" alt="Local Neighbourhood visualization">
+      </div>
+    </div>
+    <div class="behavior">
+      <h3>Simulation</h3>
+      <p>Illustrates how boids within a local neighbourhood dynamically adjust their movements based on the positions and velocities of nearby peers. This example demonstrates the local neighbourhood's role in guiding collective behaviors, ensuring cohesive yet flexible swarm interactions without central coordination.</p>
+      <div class="behavior-images">
+        <img src="assets/Images/local_neighborhood/local_neighborhood_2.png" alt="Simulation of boids adjusting to local neighbourhood">
+      </div>
+    </div>
+  </div> -->
+  <li><h2>Local Neighbourhood</h2></li>
+  <!-- <p>The local neighbourhood is defined as the area around a boid in which it senses and responds to its peers. This concept is crucial for implementing swarm behaviors, as it determines how individual boids perceive and interact with each other, influencing the collective movement and decision-making processes of the swarm.</p> -->
+
+  <!-- <p>The local neighbourhood delineates the area around a boid where it can sense and interact with others. This concept underpins the adaptive and cohesive movements seen in swarms, allowing for a decentralized decision-making process that results in complex, emergent behaviors. It dynamically adjusts as the swarm moves, ensuring that each boid's actions are influenced by its immediate surroundings.</p> -->
+
+  <p class="explanation">The local neighbourhood around a boid encompasses the area where it can sense and interact with other boids, critically influenced by spatial proximity and directional alignment. Spatial proximity refers to how close other boids are, while directional alignment and field of view (FoV) consider the direction boids are facing relative to each other. Together, these factors ensure a boid only responds to others within a certain distance and within its line of sight, enabling more natural and cohesive swarm behaviors. This blend of proximity and FoV helps simulate complex interactions and movements, mirroring the nuanced dynamics seen in natural swarms.</p>
+
+  <div class="behaviors-grid">
+    <div class="behavior">
+      <h3>Description</h3>
+      <p class="explanation">In the local neighbourhood, a boid detects nearby boids and obstacles, facilitating essential swarm behaviors like alignment, cohesion, and separation. These interactions are critical for simulating realistic flocking dynamics, enabling the swarm to navigate its environment as a cohesive unit while avoiding collisions.</p>
+      <div class="behavior-images">
+        <img src="assets/Images/local_neighborhood/local_neighborhood_1.png" alt="Local Neighbourhood visualization">
+      </div>
+    </div>
+    <div class="behavior">
+      <h3>Simulation</h3>
+      <p class="explanation">This demonstrates boids adjusting their movements based on the local neighbourhood's dynamic changes. It highlights the significance of immediate peer influence in guiding collective behavior, ensuring the swarm's cohesive yet adaptable interaction patterns without the need for central coordination.</p>
+      <div class="behavior-images">
+        <img src="assets/Images/local_neighborhood/local_neighborhood_2.png" alt="Simulation of boids adjusting to local neighbourhood">
+      </div>
+    </div>
+  </div>
+  
+  <li><h2>Effect of Local Neighbourhood (FoV)</h2></li>
+  <!-- <p> A reduced FoV produces a streamlined flocking pattern, like bird movements in the sky. </p> -->
+  <div class="behaviors-grid">
+    <div class="behavior">
+      <h3>Small FoV</h3>
+      <p>A reduced FoV produces a streamlined flocking pattern, like bird movements in the sky.</p>
+      <div class="behavior-images">
+        <img src="assets/Images/Results and Plots/FoV/birds.png" alt="135 degrees FoV">
+      </div>
+    </div>
+    <div class="behavior">
+      <h3>135 FoV Example</h3>
+      <p>10 boids (all leaders) reach a designated position while slowing down as they arrive.</p>
+      <div class="behavior-images">
+        <img src="assets/Images/Results and Plots/FoV/135_fov.png" alt="360 degrees FoV">
+      </div>
+    </div>
+  </div>
+
+  <!-- <p>A large FoV results in circular/elliptical clusters like buffaloes. </p> -->
+  <div class="behaviors-grid">
+    <div class="behavior">
+      <h3>Large FoV</h3>
+      <p>A large FoV results in circular/elliptical clusters like buffaloes</p>
+      <div class="behavior-images">
+        <img src="assets/Images/Results and Plots/FoV/buffalo.png" alt="135 degrees FoV">
+      </div>
+    </div>
+    <div class="behavior">
+      <h3>360 FoV Example</h3>
+      <p>10 boids (all leaders) reach a designated position while slowing down as they arrive.</p>
+      <div class="behavior-images">
+        <img src="assets/Images/Results and Plots/FoV/360_fov.png" alt="360 degrees FoV">
+      </div>
+    </div>
+  </div>
+
+</ul>
+</section>
+
+<!-- 
+  <li><h2>Local Neighbourhood</h2></li>
+  <p> The local neighbourhood is the region around a boid within which it can interact with other boids. </p>
+  <div class="behaviors-grid">
+    <div class="behavior">
+      <h3>Description</h3>
+      <p>Basic description of arrival behaviour showing goal region, sub-goals and slowing region.</p>
+      <div class="behavior-images">
+        <img src="assets/Images/local_neighborhood/local_neighborhood_1.png" alt="Cohesion behavior">
+      </div>
+    </div>
+    <div class="behavior">
+      <h3>Simulation</h3>
+      <p>10 boids (all leaders) reach a designated position while slowing down as they arrive.</p>
+      <div class="behavior-images">
+        <img src="assets/Images/local_neighborhood/local_neighborhood_2.png" alt="Cohesion behavior">
+      </div>
+    </div>
+  </div>
+</ul>
+</section> -->
+
+<section id="implemented-behaviors">
+  <h1>Achieving Coordination</h1>
+  <p>We implemented various behaviors inspired by Reynolds' rules for multi-robot systems. These behaviors allow the robots to exhibit coordinated movements and achieve specific objectives. Each behavior serves a unique purpose and contributes to the overall functionality of the system.</p>
+
+<!-- <h2>Basic Behaviors</h2>
+<div class="behaviors-grid">
+  <div class="behavior">
+    <h3>Separation</h3>
+    <p>This behavior ensures each robot maintains a certain distance from others to avoid collisions.</p>
+    <div class="behavior-images">
+      <img src="assets/gif/separation.gif" alt="Separation behavior">
+    </div>
+  </div>
+  <div class="behavior">
+    <h3>Alignment</h3>
+    <p>Alignment behavior makes the robots align their direction of movement with their neighbors.</p>
+    <div class="behavior-images">
+      <img src="assets/gif/alignment.gif" alt="Alignment behavior">
+    </div>
+  </div>
+  <div class="behavior">
+    <h3>Cohesion</h3>
+    <p>Cohesion encourages robots to steer towards the average position of nearby robots, promoting group cohesion.</p>
+    <div class="behavior-images">
+      <img src="assets/gif/Cohesion.gif" alt="Cohesion behavior">
+    </div>
+  </div>
+</div> -->
+
+
+<h2>Basic Behaviors</h2>
+<p class="explanation"></p>
+<div class="three-cards-grid">
+  <div class="behavior">
+    <h3>Separation</h3>
+    <p>This behavior ensures each robot maintains a certain distance from others to avoid collisions.</p>
+    <div class="behavior-images">
+      <img src="assets/gif/separation.gif" alt="Separation behavior">
+    </div>
+  </div>
+  <div class="behavior">
+    <h3>Alignment</h3>
+    <p>Alignment behavior makes the robots align their direction of movement with their neighbors.</p>
+    <div class="behavior-images">
+      <img src="assets/gif/alignment.gif" alt="Alignment behavior">
+    </div>
+  </div>
+  <div class="behavior">
+    <h3>Cohesion</h3>
+    <p>Cohesion encourages robots to steer towards the average position of nearby robots, promoting group cohesion.</p>
+    <div class="behavior-images">
+      <img src="assets/gif/Cohesion.gif" alt="Cohesion behavior">
+    </div>
+  </div>
+</div>
+
+
+<h2 >Local Migratory Urge</h2>
+ <p id="explanation"> The Arrival behavior is designed for the robots to reach a designated position while gradually slowing down as the swarm
+  gets closer to the target. This behavior carefully adjusts the swarm’s
+  speed, gradually reducing it until it comes to a complete
+  stop at the target location. The process starts when the flock
+  is still a considerable distance from the target, moving at its
+  maximum speed. As it enters a predefined slowing distance, the speed begins to diminish. Beyond this radius, the
+  desired velocity stays at the maximum limit, but once inside,
+  it’s steadily reduced to zero. To smoothen this convergence,
+  the hyperbolic tangent function (tanh) is used. This step-by-step reduction in speed, triggered when the current speed
+  surpasses a set slowdown level and the swarm is within the
+  slowing radius, ensures that the flock decelerates smoothly,
+  ultimately stopping precisely at the goal. The steering force
+  also decreases accordingly, reducing to zero as the target is
+  neared.</p>
+<div class="behaviors-grid">
+  <div class="behavior">
+    <h3>Arrival Description</h3>
+    <p>Basic description of arrival behaviour showing goal region, sub-goals and slowing region.</p>
+    <div class="behavior-images">
+      <img src="assets/Images/Seek Arrive/arrival.png" alt="Cohesion behavior">
+    </div>
+  </div>
+  <div class="behavior">
+    <h3>Arrival Simulation</h3>
+    <p>10 boids (all leaders) reach a designated position while slowing down as they arrive.</p>
+    <div class="behavior-images">
+      <img src="assets/gif/map_a2.gif" alt="Cohesion behavior">
+    </div>
+  </div>
+</div>
+
+<h2 >Obstacle Avoidance</h2>
+<p id="explanation">The behaviors described above ensure cohesive flock movement among the boids while preventing collisions with each
+  other. However, the environment may introduce obstacles
+  that necessitate avoidance maneuvers by the boids. The two strategies we implemented for obstacle avoidance are shown below.</p>
+
+  <ul>
+    <li><h3>Potential Fields</h3></li>
+    <p>Obstacle avoidance ensures that robots can identify and navigate around obstacles in their path.</p>
+    <div class="behaviors-grid">
+      <div class="behavior">
+        <h3>Potential Fields</h3>
+        <p>Obstacle avoidance ensures that robots can identify and navigate around obstacles in their path.</p>
+        <div class="behavior-images">
+          <img src="assets/Images/Obstacle Avoidance/Potential Field/cricle_potfield.png" alt="Cohesion behavior">
+        </div>
+      </div>
+      <div class="behavior">
+        <h3>Potential Fields</h3>
+        <p>This behavior ensures each robot maintains a certain distance from others to avoid collisions.</p>
+        <div class="behavior-images">
+          <img src="assets/Images/Obstacle Avoidance/Potential Field/circle.png" alt="Steer to Avoid Image 2">
+        </div>
+      </div>
+      <div class="behavior">
+        <h3>Potential Fields</h3>
+        <p>This behavior ensures each robot maintains a certain distance from others to avoid collisions.</p>
+        <div class="behavior-images">
+          <img src="assets/Images/Obstacle Avoidance/Potential Field/hard_maze.png" alt="Steer to Avoid Image 2">
+        </div>
+      </div>
+      <div class="behavior">
+        <h3>Potential Fields</h3>
+        <p>This behavior ensures each robot maintains a certain distance from others to avoid collisions.</p>
+        <div class="behavior-images">
+          <img src="assets/Images/Obstacle Avoidance/Potential Field/simple_maze.png" alt="Steer to Avoid Image 2">
+        </div>
+      </div>
+    </div>
+
+    <li><h3>Steer to Avoid</h3></li>
+    <p>This behavior ensures each robot maintains a certain distance from others to avoid collisions.</p>
+    <div class="behaviors-grid">
+      <div class="behavior">
+        <h3>Algorithm</h3>
+        <p>Obstacle avoidance ensures that robots can identify and navigate around obstacles in their path.</p>
+        <div class="behavior-images">
+          <img src="assets/Images/Obstacle Avoidance/See to Avoid/steer_to_avoid.png" alt="Cohesion behavior">
+        </div>
+      </div>
+      <div class="behavior">
+        <h3>Corner Case</h3>
+        <p>This behavior ensures each robot maintains a certain distance from others to avoid collisions.</p>
+        <div class="behavior-images">
+          <img src="assets/Images/Obstacle Avoidance/See to Avoid/corners.png" alt="Steer to Avoid Image 2">
+        </div>
+      </div>
+    </div>
+  </ul>
+
+ 
+<h2>Obstacle Avoidance Simulation</h2>
+<div class="behaviors-grid">
+  <div class="behavior">
+    <h3>Obstacle Avoidance</h3>
+    <p>Obstacle avoidance ensures that robots can identify and navigate around obstacles in their path.</p>
+    <div class="behavior-images">
+      <img src="assets/gif/Cohesion.gif" alt="Cohesion behavior">
+    </div>
+  </div>
+  <div class="behavior">
+    <h3>Steer to Avoid</h3>
+    <p>This behavior ensures each robot maintains a certain distance from others to avoid collisions.</p>
+    <div class="behavior-images">
+      <!-- <img src="assets/gif/steer_to_avoid_1.gif" alt="Steer to Avoid Image 1"> -->
+      <img src="assets/gif/steer_to_avoid_2.gif" alt="Steer to Avoid Image 2">
+      <!-- <img src="assets/gif/s.gif" alt="Steer to Avoid Image 3"> -->
+    </div>
+  </div>
+</div>
+
+</section>
+
+<section>
+  <h2 id="algorithm-description">Prioritized Acceleration</h2>
+  <p id="explanation">Prioritized acceleration allocation uses a hierarchy to assign accelerations to behaviors based on their importance, adjusting for scenario changes.</p> 
+  
+  <div class="behaviors-grid">
+    <div class="behavior">
+      <h3>Priority Pyramid</h3>
+      <p>Obstacle avoidance ensures that robots can identify and navigate around obstacles in their path.</p>
+      <div class="behavior-images">
+        <img src="assets/Images/Acceleration/prioritized_acceleration.png" alt="prioritized acceleration pyramid">
+      </div>
+    </div>
+  </div>
+</ul>
+  <p id="explanation"> is given according to a priority list, stopping when reaching the boid's maximum limit—if exceeded, the last behavior's allocation is reduced. This system prioritizes critical behaviors, like obstacle avoidance, over less critical ones, such as flock cohesion.</p>
+  <!-- <div class="behaviors-grid">
+    <div class="behavior">
+      <div class="behavior-images">
+        <img src="assets/gif/acceleration_request.gif" alt="Result GIF 1" width="100%">
+      </div>
+      <p id="explanation">Basic Behaviors, Obstacle Avoidance & Migratory Urge.</p>
+    </div>
+  </div> -->
+
+  <div class="full-width-behaviors">
+    <div class="full-width-behavior">
+      <div class="behavior-images">
+        <img src="assets/gif/acceleration_request.gif" alt="Result GIF 1" width="100%">
+      </div>
+      <p id="explanation">Basic Behaviors, Obstacle Avoidance & Migratory Urge.</p>
+    </div>
+  </div>
+
+</section>
+
+
+
+<!-- <h1 id="algorithm-description">Algorithm Description</h1>
+<p>Our implementation is a variation of [1] by Andrew Howard. We have used KITTI visual odometry [2] dataset for experimentation. All the computation is done on grayscale images. The top level pipeline is shown in figure 1.</p> -->
+
+<section id="system-architecture">
+  <h2>System Architecture</h2>
+  <p>
+    Our system's architecture is based on the Robot Operating System (ROS), which facilitates the integration and processing of various data streams critical to autonomous navigation. Config Parameters initialize the system by defining operational constraints such as field of view (FOV) range and angle, behavior weights, priority lists, in-case of arrival (method for leader determination, and number of leaders), which are essential for delineating the interactive space between robots.
+  </p>
+  <div align="center">
+    <img src="./assets/Images/reynolds4.png" width="580" height="350" />
+    <br />Figure 1: Swarm Algorithm Pipeline<br />
+  </div>
+    
+  <p>
+    The determination of <strong>Neighbours</strong> relies on the position and velocity information provided by ROS, filtered through the specified Config Parameters. This process ensures that only relevant nearby entities are considered for subsequent behavioral calculations.
+  </p>
+  <p>
+    <strong>Goals</strong> input conveys target locations to the boids, directing navigational behaviors. The 'Seek' behavior propels the flock toward these targets, while the 'Arrival' behavior manages deceleration and precise stopping at the destination points.
+  </p>
+  <p>
+    The <strong>Gridmap</strong> input supplies the layout of the environment, identifying navigable versus occupied spaces. This information is crucial for the 'Obstacle Avoidance' behavior, enabling the flock to navigate around impediments effectively.
+  </p>
+  <p>
+    The <strong>Accumulator</strong> balances the output from the 'Basic Behaviours' module, which comprises 'Seek', 'Arrival', and 'Obstacle Avoidance'. Whether to strongploy a priority list is a configurable parameter that influences how the accumulator behaves. It prioritizes (if specified) and sums these behaviors to generate appropriate 'acceleration', scaling thstrong based on the specified weight for each behavior. This prioritization is essential in scenarios where immediate environmental responses must be balanced with long-term navigational goals.
+  </p>
+  <p>
+    The <strong>Motion Model</strong> calculates the new velocity <strong>v = u + at</strong> by adding the acceleration from the <strong>Accumulator</strong> with the boids prior velocity. It then issues <strong>Velocity Commands</strong> that actuate the boids movstrongent.
+  </p>
+  <p>
+    Finally, the <strong>Stage Simulator</strong> component simulates a physical environment for the robots, providing a feedback loop that refines the 'Motion Model' through 'Velocity Commands' derived from behavioral outputs. This simulation ensures that modeled behaviors are reflective of potential real-world scenarios.
+  </p>
+</section>
+
+
+
+
+<section id="simulation-results">
+<h1 id="results">Simulation Results</h1>
+<p>We have implemented the above algorithm using Python 3 and ROS and source code is maintained <a href="https://github.com/KhAlamdar11/mrs-r1">here</a>. The algorithm was tested by simulating flock motion in four basic map environments</p>
+<!-- --------------------------------- MAPS --------------------------------- -->
+<h2 >Map Environments in Stage</h2>
+<div class="behaviors-grid">
+  <div class="behavior">
+    <h3>Map A</h3>
+    <div class="behavior-images">
+      <img src="assets/images/mapA.png" alt="Map A">
+    </div>
+    <p id="explanation">10x10 empty map environment.</p>
+  </div>
+  <div class="behavior">
+    <h3>Map B</h3>
+    <div class="behavior-images">
+      <img src="assets/images/mapB.png" alt="Map B">
+    </div>
+    <p id="explanation">10x10 gridmap with obstacles (black).</p>
+  </div>
+  <div class="behavior">
+    <h3>Map C</h3>
+    <div class="behavior-images">
+      <img src="assets/images/mapC.png" alt="Map C">
+    </div>
+    <p id="explanation">10x10 gridmap with obstacles (black).</p>
+  </div>
+  <div class="behavior">
+    <h3>Map D</h3>
+    <div class="behavior-images">
+      <img src="assets/images/mapD.png" alt="Map D">
+    </div>
+    <p id="explanation">10x10 gridmap with obstacles (black).</p>
+  </div>
+</div>
+
+<p>The results obtained from testing the algorithm in these map environments are presented below.</p>
+
+
+<!-- ------------------------ MAP A Results ------------------------ -->
+
+<h3> Map A Environment Results</h3>
+<div class="behaviors-grid">
+  <div class="behavior">
+    <div class="behavior-images">
+      <img src="assets/gif/map_a1.gif" alt="Empty Map">
+    </div>
+    <p id="explanation">Basic behaviors with steer-to-avoid, 20 boids. As the number of boids increases, more precisely tuned parameters are required to ensure fluid movements, especially at corners where the allowed turned radius may be too small for a large flock. </p> 
+  </div>
+  <div class="behavior">
+    <div class="behavior-images">
+      <img src="assets/gif/map_a2.gif" alt="Empty Map">
+    </div>
+    <p id="explanation">Basic behaviors with migratory urge.</p>
+  </div>
+</div>
+
+
+<!-- ------------------------ MAP B Results ------------------------ -->
+<!-- <h3> Map  Environment Results</h3> -->
+<div class="behaviors-grid">
+  <div class="behavior">
+    <h3>Slit Map</h3>
+    <div class="behavior-images">
+      <img src="assets/gif/map_r1.gif" alt="Empty Map">
+    </div>
+    <p id="explanation">Navigating a slit with a small FoV.</p>
+  </div>
+  <div class="behavior">
+    <h3>Map A</h3>
+    <div class="behavior-images">
+      <img src="assets/gif/map_r2.gif" alt="Empty Map">
+    </div>
+    <p id="explanation">Multi-Goal Aggregation.</p>
+  </div>
+</div>
+
+
+<!-- ------------------------ MAP B Results ------------------------ -->
+
+<h3> Map B Environment Results</h3>
+<div class="behaviors-grid">
+  <div class="behavior">
+    <div class="behavior-images">
+      <img src="assets/gif/map_b1.gif" alt="Empty Map">
+    </div>
+    <p id="explanation">10 Boids Flocking with Obstacle Avoidance.
+      This shows the boids successfully avoid obsta
+      cles of different shapes and sizes, bifurcating
+      and converging where necessary</p>
+  </div>
+  <div class="behavior">
+    <div class="behavior-images">
+      <img src="assets/gif/map_b2.gif" alt="Empty Map">
+    </div>
+    <p id="explanation">10 Boids Migrate to a Set Goal while Avoid-
+      ing Obstacles. Given that the obstacles are not
+      long stretches of walls (like in mazes), arrival at
+      the set goal is always guaranteed on this map.</p>
+  </div>
+</div>
+
+
+<!-- ------------------------ MAP C Results ------------------------ -->
+
+<h3> Map C Environment Results</h3>
+<div class="behaviors-grid">
+  <div class="behavior">
+    <div class="behavior-images">
+      <img src="assets/gif/map_c1.gif" alt="Empty Map">
+    </div>
+    <p id="explanation">10 Boids Flocking with Obstacle Avoidance. At the highlighted corner, the boids approach from two different directions due to the bifurcation and subsequent convergence that occurred.</p>
+  </div>
+  <div class="behavior">
+    <div class="behavior-images">
+      <img src="assets/gif/map_c2.gif" alt="Empty Map">
+    </div>
+    <p id="explanation">10 Boids Migrate to a Set Goal while Avoiding Obstacles. The effect of the arrival vector is evident by the trajectory of the boids (predominantly oriented toward the goal).</p>
+  </div>
+</div>
+
+<!-- ------------------------ MAP D Results ------------------------ -->
+
+<h3> Map D Environment Results</h3>
+<div class="behaviors-grid">
+  <div class="behavior">
+    <div class="behavior-images">
+      <img src="assets/gif/map_d1.gif" alt="Empty Map">
+    </div>
+    <p id="explanation">Basic Behaviors, Obstacle Avoidance & Migratory Urge.</p>
+  </div>
+  <div class="behavior">
+    <div class="behavior-images">
+      <img src="assets/gif/see_through.png" alt="Empty Map">
+    </div>
+    <p id="explanation">See through wall corner-case.</p>
+  </div>
+</div>
+</section>
+<!-- ------------------------ ADDITIONAL MAPS ------------------------ -->
+
+<!-- <h2>Additional Map Environments</h2>
+<div class="behaviors-grid">
+  <div class="behavior">
+    <div class="behavior-images">
+      <img src="assets/gif/asteroid_1.gif" alt="Result GIF 1" width="100%">
+    </div>
+    <p id="explanation">Basic Behaviors, Obstacle Avoidance & Migratory Urge.</p>
+  </div>
+  <div class="behavior">
+    <div class="behavior-images">
+      <img src="assets/gif/asteroid_2.gif" alt="Result GIF 1" width="100%">
+    </div>
+    <p id="explanation">Basic Behaviors, Obstacle Avoidance & Migratory Urge.</p>
+  </div>
+  <div class="behavior">
+    <div class="behavior-images">
+      <img src="assets/gif/demo_asteroid2.gif" alt="Result GIF 1" width="100%">
+    </div>
+    <p id="explanation">Inflating obstacles in the map.</p>
+  </div>
+</div> -->
+
+<!-- ----------------------------------------------------------------------------------- -->
+
+<!-- <div class="behaviors-grid">
+  <div class="behavior">
+    <div class="behavior-images">
+      <img src="assets/gif/asteroid_1.gif" alt="Result GIF 1" width="100%">
+    </div>
+    <p id="explanation">Basic Behaviors, Obstacle Avoidance & Migratory Urge.</p>
+  </div>
+</div> -->
+
+<!-- <div class="behaviors-grid">
+  <div class="behavior">
+    <div class="behavior-images">
+      <img src="assets/gif/asteroid_2.gif" alt="Result GIF 1" width="100%">
+    </div>
+    <p id="explanation">Basic Behaviors, Obstacle Avoidance & Migratory Urge.</p>
+  </div>
+</div> -->
+
+
+<!-- 
+<h2>Additional Map Environment</h2>
+<div align="center">
+  <div class="result-gifs">
+    <img src="assets/gif/acceleration_request.gif" alt="Result GIF 1" width="100%">
+  </div>
+Figure 6: Output trajectory for sequence 00 and 02 from KITTI dataset <br/>
+</div>
+
+<div align="center">
+  <div class="result-gifs">
+    <img src="assets/gif/asteroid_1.gif" alt="Result GIF 1" width="100%">
+  </div>
+Figure 6: Output trajectory for sequence 00 and 02 from KITTI dataset <br/>
+</div>
+
+<div align="center">
+  <div class="result-gifs">
+    <img src="assets/gif/asteroid_2.gif" alt="Result GIF 1" width="100%">
+  </div>
+Figure 6: Output trajectory for sequence 00 and 02 from KITTI dataset <br/>
+</div> -->
+
+<!-- </section> -->
+<section>
+<h2>Additional Map Environments</h2>
+<div class="full-width-behaviors">
+  <div class="full-width-behavior">
+    <div class="behavior-images">
+      <img src="assets/gif/asteroid_1.gif" alt="Result GIF 1">
+    </div>
+    <p id="explanation">Basic Behaviors, Obstacle Avoidance & Migratory Urge.</p>
+  </div>
+  <div class="full-width-behavior">
+    <div class="behavior-images">
+      <img src="assets/gif/asteroid_2.gif" alt="Result GIF 2">
+    </div>
+    <p id="explanation">Basic Behaviors, Obstacle Avoidance & Migratory Urge.</p>
+  </div>
+  <div class="full-width-behavior">
+    <div class="behavior-images">
+      <img src="assets/gif/demo_asteroid2.gif" alt="Result GIF 3">
+    </div>
+    <p id="explanation">Inflating obstacles in the map.</p>
+  </div>
+  <!-- Add more behaviors if needed -->
+</div>
+</section>
+
+<section id="discussion-future-work">
+  <h1 id="discussion--future-work">Discussion &amp; Future work</h1>
+  <p>
+  To conclude, this project aimed to implement Reynolds’
+  rules for swarm control in a simulated environment using robots. Initially, the basic Reynolds’ rules—separation,
+  alignment, and cohesion—were successfully implemented
+  and tested in the Stage simulator within a mapped frame.
+  In this phase, we expanded the Reynolds’ rules to include
+  navigation to specific points and obstacle avoidance for
+  the swarm. These additions aimed to enhance the swarm’s
+  capabilities by enabling it to navigate towards designated
+  points while gradually reducing speed as it neared the
+  goal, and to actively evade obstacles as they came into
+  proximity. The thorough testing across diverse maps, encompassing various obstacles and maze structures, allowed
+  us to evaluate how well these rules performed and adapted
+  within different scenarios. Moving forward, the transition to
+  hardware implementation stands as the future work for this
+  project. Real-world application of these refined rules and
+  innovative algorithms on physical robots would validate
+  their practicality and efficiency, opening doors for their
+  integration into various industries where swarm intelligence
+  could bring about substantial advancements
+  </p>
+</section>
+
+
+<!-- 
+<p id="explanation">The results obtained match the ground truth trajectory initially, but small errors accumulate resulting in egregious poses if algorithm is run for longer travel time. It is to be noted that although the absolute position is wrong for latter frames the relative motion (translation and rotation) is still tracked. SLAM characteristics like loop closure can be used to help correct the drift in measurement.</p>
+
+<p>There are several tunable parameters in the algorithm which can be tuned to adjust the accuracy of output, some of the parameters are: block size for disparity computation and KLT tracker, various error thresholds such as for KLT tracker, feature re-projection, clique rigidity constraint. More work is required to develop an adaptive framework which adjusts their parameters based on feedback and other sensor data.</p>
+
+<p>All brightness-based motion tracker perform poorly for sudden changes in image luminance, therefore a robust brightness invariant motion tracking algorithm is needed to accurately predict motion. Neural networks such as Universal Correspondence Networks [3] can be tried out but the real-time runtime constrains of visual odometry may not accommodate for it. A faster inlier detection algorithm is also needed to speed up the algorithm, added heuristics such as an estimate how accurate each feature 2D-3D point pair is can help with early termination of inlier detection algorithm.</p> -->
+
+
+<section id="resources">
+<h1 id="note">Resources</h1>
+<ul>
+  <li>
+    <p>The report for this project can be found <a href="assets/MRS_project1_report.pdf">here</a></p>
+  <li>
+    <p>The powerpoint presentation can be found <a href="assets/MRS-project1-presentation.pptx">here</a></p>
+  </li>
+  <li>
+    <p>The source code can be found <a href="https://github.com/KhAlamdar11/mrs-r1">here</a></p>
+  </li>
+</ul>
+</section>
+
+
+<section id="references">
+<h1 id="references">References</h1>
+<p>[1] . Lengyel, M. Reichert, B. R. Donald, and D. P. Greenberg, “Real-
+  time robot motion planning using rasterizing computer graphics
+  hardware,” SIGGRAPH ’90, (New York, NY, USA), p. 327–335,
+  Association for Computing Machinery, 1990.  </p>
+</section>
+
+
+<footer class="site-footer" id="explanation">
+      <span class="site-footer-owner"><a href="https://github.com/KhAlamdar11/mrs-r1">Multi-Robot-Systems</a> is maintained by the<a href="https://github.com/cgarg92"> Authors</a>.</span>
+    
+    <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> and adapted from  <a href="https://github.com/cgarg92/Stereo-visual-odometry">cgarg92 SVO</a>
+  </footer>
+
+
+</section>
+
+    
+  </body>
+</html>
